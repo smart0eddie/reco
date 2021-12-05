@@ -28,6 +28,9 @@ parser.add_argument('--temp', default=0.5, type=float)
 parser.add_argument('--backbone', default='deeplabv3p', type=str, help='choose backbone: deeplabv3p, deeplabv2')
 parser.add_argument('--seed', default=0, type=int)
 
+parser.add_argument('--save_dir', default='model_weights', type=str, help='where to save model')
+parser.add_argument('--log_dir', default='logging', type=str, help='where to save logs')
+
 args = parser.parse_args()
 
 torch.manual_seed(args.seed)
@@ -47,7 +50,9 @@ elif args.backbone == 'deeplabv2':
 total_epoch = 200
 optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=0.9, nesterov=True)
 scheduler = PolyLR(optimizer, total_epoch, power=0.9)
+
 create_folder(args.save_dir)
+create_folder(args.log_dir)
 
 train_epoch = len(train_l_loader)
 test_epoch = len(test_loader)
