@@ -81,7 +81,7 @@ for index in range(total_epoch):
                 label = F.interpolate(label_onehot(train_label, data_loader.num_segments), size=pred.shape[2:], mode='nearest')
                 prob = torch.softmax(pred, dim=1)
 
-            reco_loss = compute_reco_loss(rep, label, mask, prob, args.strong_threshold, args.temp, args.num_queries, args.num_negatives)
+            reco_loss = compute_reco_loss(rep, label, mask, prob)
             loss = sup_loss + reco_loss
         else:
             loss = sup_loss
