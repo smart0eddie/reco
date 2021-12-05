@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from module_list import *
 
-root = 'dataset'
+root = 'dataset/cityscapes'
 im_root = 'dataset/cityscapes/images'
 label_root = 'dataset/cityscapes/labels'
 
@@ -20,6 +20,7 @@ os.makedirs(label_root + '/val')
 
 train_im_list = glob.glob(root + '/leftImg8bit_trainvaltest/leftImg8bit/train/*')
 counter = 0
+print(train_im_list)
 for city in train_im_list:
     im_list = glob.glob(city + '/*.png')
     im_list.sort()
@@ -33,6 +34,7 @@ print('Training RGB images processing has completed.')
 
 val_im_list = glob.glob(root + '/leftImg8bit_trainvaltest/leftImg8bit/val/*')
 counter = 0
+print(val_im_list)
 for city in val_im_list:
     im_list = glob.glob(city + '/*.png')
     im_list.sort()
