@@ -305,7 +305,7 @@ def get_glas_idx(root, train=True, label_num=5, ratio=0):
                 idx_list_ = save_idx.copy()
                 idx = idx_list_.pop()
                 save_idx = []
-            mask = np.array(Image.open(root + '/SegmentationClassAug/{}.png'.format(idx)))
+            mask = np.array(Image.open(root + '{}.bmp'.format(idx)))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)   # number of unique classes
 
@@ -463,7 +463,7 @@ class BuildDataLoader:
             self.num_segments = 2
             self.scale_size = (0.5, 1.5)
             self.batch_size = 10
-            self.train_l_idx, self.train_u_idx = get_glas_idx(self.data_path, train=True, label_num=num_labels)
+            self.train_l_idx, self.train_u_idx = get_glas_idx(self.data_path, train=True, label_num=num_labels, ratio=ratio)
             self.test_idx = get_glas_idx(self.data_path, train=False)
 
         if num_labels == 0:  # using all data

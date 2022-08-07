@@ -37,7 +37,7 @@ torch.manual_seed(args.seed)
 np.random.seed(args.seed)
 random.seed(args.seed)
 
-data_loader = BuildDataLoader(args.dataset, args.num_labels)
+data_loader = BuildDataLoader(args.dataset, args.num_labels, ratio=args.label_ratio)
 train_l_loader, train_u_loader, test_loader = data_loader.build(supervised=False)
 
 # Load Semantic Network
