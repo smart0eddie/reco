@@ -305,7 +305,7 @@ def get_glas_idx(root, train=True, label_num=5, ratio=0):
                 idx_list_ = save_idx.copy()
                 idx = idx_list_.pop()
                 save_idx = []
-            mask = np.array(Image.open(root + '{}.bmp'.format(idx)))
+            mask = np.array(Image.open(root + '/{}.bmp'.format(idx)))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)   # number of unique classes
 
@@ -407,14 +407,14 @@ class BuildDataset(Dataset):
             return image, label.squeeze(0)
 
         if self.dataset == 'glas':
-            image_root = Image.open(self.root + '{}.bmp'.format(self.idx_list[index]))
+            image_root = Image.open(self.root + '/{}.bmp'.format(self.idx_list[index]))
             if self.apply_partial is None:
-                label_root = Image.open(self.root + '{}_anno.bmp'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/{}_anno.bmp'.format(self.idx_list[index]))
             else:
-                label_root = Image.open(self.root + '{}_{}/{}_anno.bmp'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
+                label_root = Image.open(self.root + '/{}_{}/{}_anno.bmp'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
 
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
-            return image, label.squeeze(0)
+            return image, label.squeeze(0).clamp(0, 1)
 
     def __len__(self):
         return len(self.idx_list)
