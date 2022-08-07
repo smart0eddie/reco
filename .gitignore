@@ -6,3 +6,6 @@
 *.jpg 
 *.bmp
 *.png
+
+# ignore Dev settings 
+.vscode/*
