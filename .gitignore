@@ -2,6 +2,8 @@
 *.iml
 *.xml
 
+*.pyc
+
 # ignore images
 *.jpg 
 *.bmp
