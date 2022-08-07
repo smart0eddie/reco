@@ -279,6 +279,79 @@ def get_sun_idx(root, train=True, label_num=5):
         return idx_list
 
 
+def get_glas_idx(root, train=True, label_num=5, ratio=0):
+    root = os.path.expanduser(root)
+    if train:
+        if ratio == 0:
+            file_name = root + '/train.txt'
+        else:
+            return get_glas_idx_train_split(root, ratio)       
+    else:
+        file_name = root + '/val.txt'
+    with open(file_name) as f:
+        idx_list = f.read().splitlines()
+
+    if train:
+        labeled_idx = []
+        save_idx = []
+        idx_list_ = idx_list.copy()
+        random.shuffle(idx_list_)
+        label_counter = np.zeros(2)
+        label_fill = np.arange(2)
+        while len(labeled_idx) < label_num:
+            if len(idx_list_) > 0:
+                idx = idx_list_.pop()
+            else:
+                idx_list_ = save_idx.copy()
+                idx = idx_list_.pop()
+                save_idx = []
+            mask = np.array(Image.open(root + '/SegmentationClassAug/{}.png'.format(idx)))
+            mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
+            unique_num = len(mask_unique)   # number of unique classes
+
+            # sample image if it includes the lowest appeared class and with more than 3 distinctive classes
+            if len(labeled_idx) == 0 and unique_num >= 3:
+                labeled_idx.append(idx)
+                label_counter[mask_unique] += 1
+            elif np.any(np.in1d(label_fill, mask_unique)) and unique_num >= 3:
+                labeled_idx.append(idx)
+                label_counter[mask_unique] += 1
+            else:
+                save_idx.append(idx)
+
+            # record any segmentation index with lowest appearance
+            label_fill = np.where(label_counter == label_counter.min())[0]
+
+        return labeled_idx, [idx for idx in idx_list if idx not in labeled_idx]
+    else:
+        return idx_list
+
+def get_glas_idx_train_split(root, ratio=1):
+    """
+    Read index from split file
+    """
+
+    root = os.path.expanduser(root)
+    
+    if ratio == 1:
+        file_name = root + '/train.txt'
+        with open(file_name) as f:
+            idx_list = f.read().splitlines()
+        
+        return idx_list
+
+    else:
+        file_name = root + f'/train_aug_labeled_1-{ratio}.txt'  
+        with open(file_name) as f:
+            labeled_idx = f.read().splitlines()
+        
+        file_name = root + f'/train_aug_unlabeled_1-{ratio}.txt'  
+        with open(file_name) as f:
+            unlabeled_idx = f.read().splitlines()
+        
+        return labeled_idx, unlabeled_idx
+    
+
 # --------------------------------------------------------------------------------
 # Create dataset in PyTorch format
 # --------------------------------------------------------------------------------
@@ -333,6 +406,16 @@ class BuildDataset(Dataset):
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0)
 
+        if self.dataset == 'glas':
+            image_root = Image.open(self.root + '{}.bmp'.format(self.idx_list[index]))
+            if self.apply_partial is None:
+                label_root = Image.open(self.root + '{}_anno.bmp'.format(self.idx_list[index]))
+            else:
+                label_root = Image.open(self.root + '{}_{}/{}_anno.bmp'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
+
+            image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
+            return image, label.squeeze(0)
+
     def __len__(self):
         return len(self.idx_list)
 
@@ -341,7 +424,7 @@ class BuildDataset(Dataset):
 # Create data loader in PyTorch format
 # --------------------------------------------------------------------------------
 class BuildDataLoader:
-    def __init__(self, dataset, num_labels):
+    def __init__(self, dataset, num_labels, datapath=None, ratio=0):
         self.dataset = dataset
         if dataset == 'pascal':
             self.data_path = 'dataset/pascal'
@@ -372,6 +455,16 @@ class BuildDataLoader:
             self.batch_size = 5
             self.train_l_idx, self.train_u_idx = get_sun_idx(self.data_path, train=True, label_num=num_labels)
             self.test_idx = get_sun_idx(self.data_path, train=False)
+        
+        if dataset == 'glas':
+            self.data_path = 'dataset/glas'
+            self.im_size = [775, 522]
+            self.crop_size = [321, 321]
+            self.num_segments = 2
+            self.scale_size = (0.5, 1.5)
+            self.batch_size = 10
+            self.train_l_idx, self.train_u_idx = get_glas_idx(self.data_path, train=True, label_num=num_labels)
+            self.test_idx = get_glas_idx(self.data_path, train=False)
 
         if num_labels == 0:  # using all data
             self.train_l_idx = self.train_u_idx
