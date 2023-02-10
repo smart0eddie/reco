@@ -416,6 +416,54 @@ class BuildDataset(Dataset):
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0).clamp(0, 1)
 
+        if self.dataset == 'crag':
+            image_root = Image.open(self.root + '/Images/{}.png'.format(self.idx_list[index]))
+            label_root = Image.open(self.root + '/Annotation/{}.png'.format(self.idx_list[index]))
+            image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
+            return image, label.squeeze(0).clamp(0, 1)
+
+        if self.dataset == 'monuseg':
+            if self.train:
+                image_root = Image.open(self.root + '/Tissue Images/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/Annotations/{}_b.png'.format(self.idx_list[index]))                
+            else:
+                image_root = Image.open(self.root + '{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '{}_b.png'.format(self.idx_list[index]))
+            image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
+            return image, label.squeeze(0).clamp(0, 1)
+
+        if self.dataset == 'livecell':
+            if self.train:
+                image_root = Image.open(self.root + '/images/livecell_train_val_images/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/masks/train-val/{}_b.png'.format(self.idx_list[index]))                
+            else:
+                image_root = Image.open(self.root + '/images/livecell_test_images/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/masks/test/{}_b.png'.format(self.idx_list[index]))
+                
+            image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
+            return image, label.squeeze(0).clamp(0, 1)
+
+        if self.dataset == 'segpc':
+            if self.train:
+                image_root = Image.open(self.root + '/train/train/train/x/{}.bmp'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/train/train/train/y_merge/{}.png'.format(self.idx_list[index]))
+            else:
+                image_root = Image.open(self.root + '/validation/validation/x/{}.bmp'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/validation/validation/y_merge/{}.png'.format(self.idx_list[index]))
+                label_root = Image.fromarray(sun_class_map(np.array(label_root)))
+            image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
+            return image, label.squeeze(0)
+
+        if self.dataset == 'mtchi':
+            if self.train:
+                image_root = Image.open(self.root + '/Task2/Training/Img_crop/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/Task2/Training/Truth_crop/Mask_{}.png'.format(self.idx_list[index]))
+            else:
+                image_root = Image.open(self.root + '/Task2/Test/Img/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.root + '/Task2/Test/Truth/Mask_{}.png'.format(self.idx_list[index]))                
+            image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
+            return image, label.squeeze(0)
+
     def __len__(self):
         return len(self.idx_list)
 
