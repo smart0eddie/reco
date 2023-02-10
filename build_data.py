@@ -350,7 +350,81 @@ def get_glas_idx_train_split(root, ratio=1):
             unlabeled_idx = f.read().splitlines()
         
         return labeled_idx, unlabeled_idx
+
+def read_idx(filepath):
+    with open(filepath) as f:
+        idx_list = f.read().splitlines()                
+    return idx_list
     
+def get_crag_idx(root, train=True, label_num=5, ratio=0):
+    root = os.path.expanduser(root)
+    if train:
+        if ratio in [0, 1]:
+            file_name = root + '/train.txt'
+            return read_idx(file_name)
+        else:
+            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            return read_idx(labeled_name),  read_idx(unlabeled_name)
+    else:
+        file_name = root + '/val.txt'
+        return read_idx(file_name)
+
+def get_monuseg_idx(root, train=True, label_num=5, ratio=0):
+    root = os.path.expanduser(root)
+    if train:
+        if ratio in [0, 1]:
+            file_name = root + '/train.txt'
+            return read_idx(file_name)
+        else:
+            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            return read_idx(labeled_name),  read_idx(unlabeled_name)
+    else:
+        file_name = root + '/val.txt'
+        return read_idx(file_name)
+
+def get_livecell_idx(root, train=True, label_num=5, ratio=0):
+    root = os.path.expanduser(root)
+    if train:
+        if ratio in [0, 1]:
+            file_name = root + '/train.txt'
+            return read_idx(file_name)
+        else:
+            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            return read_idx(labeled_name),  read_idx(unlabeled_name)
+    else:
+        file_name = root + '/test.txt'
+        return read_idx(file_name)
+
+def get_segpc_idx(root, train=True, label_num=5, ratio=0):
+    root = os.path.expanduser(root)
+    if train:
+        if ratio in [0, 1]:
+            file_name = root + '/train.txt'
+            return read_idx(file_name)
+        else:
+            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            return read_idx(labeled_name),  read_idx(unlabeled_name)
+    else:
+        file_name = root + '/val.txt'
+        return read_idx(file_name)
+
+def get_mtchi_idx(root, train=True, label_num=5, ratio=0):
+    root = os.path.expanduser(root)
+    if train:
+        if ratio in [0, 1]:
+            file_name = root + '/train_crop.txt'
+            return read_idx(file_name)
+        else:
+            labeled_name = root + f'subset_train/train_crop_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'subset_train/train_crop_unlabeled_1-{ratio}.txt'
+            return read_idx(labeled_name),  read_idx(unlabeled_name)
+    else:
+        file_name = root + '/test.txt'
+        return read_idx(file_name)
 
 # --------------------------------------------------------------------------------
 # Create dataset in PyTorch format
