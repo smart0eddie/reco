@@ -693,7 +693,7 @@ class BuildDataLoader:
 
         test_loader = torch.utils.data.DataLoader(
             test_dataset,
-            batch_size=4,
+            batch_size=self.test_batch,
             shuffle=False,
         )
         if supervised:
