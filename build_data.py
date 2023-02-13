@@ -430,9 +430,10 @@ def get_mtchi_idx(root, train=True, label_num=5, ratio=0):
 # Create dataset in PyTorch format
 # --------------------------------------------------------------------------------
 class BuildDataset(Dataset):
-    def __init__(self, root, dataset, idx_list, crop_size=(512, 512), scale_size=(0.5, 2.0),
+    def __init__(self, root, data_root, dataset, idx_list, crop_size=(512, 512), scale_size=(0.5, 2.0),
                  augmentation=True, train=True, apply_partial=None, partial_seed=None):
         self.root = os.path.expanduser(root)
+        self.data_root = os.path.expanduser(data_root)
         self.train = train
         self.crop_size = crop_size
         self.augmentation = augmentation
@@ -444,97 +445,101 @@ class BuildDataset(Dataset):
 
     def __getitem__(self, index):
         if self.dataset == 'pascal':
-            image_root = Image.open(self.root + '/JPEGImages/{}.jpg'.format(self.idx_list[index]))
+            image_root = Image.open(self.data_root + '/JPEGImages/{}.jpg'.format(self.idx_list[index]))
             if self.apply_partial is None:
-                label_root = Image.open(self.root + '/SegmentationClassAug/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/SegmentationClassAug/{}.png'.format(self.idx_list[index]))
             else:
-                label_root = Image.open(self.root + '/SegmentationClassAug_{}_{}/{}.png'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
+                label_root = Image.open(self.data_root + '/SegmentationClassAug_{}_{}/{}.png'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
 
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0)
 
         if self.dataset == 'cityscapes':
             if self.train:
-                image_root = Image.open(self.root + '/images/train/{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/images/train/{}.png'.format(self.idx_list[index]))
                 if self.apply_partial is None:
-                    label_root = Image.open(self.root + '/labels/train/{}.png'.format(self.idx_list[index]))
+                    label_root = Image.open(self.data_root + '/labels/train/{}.png'.format(self.idx_list[index]))
                 else:
-                    label_root = Image.open(self.root + '/labels/train_{}_{}/{}.png'.format(self.apply_partial,  self.partial_seed, self.idx_list[index]))
+                    label_root = Image.open(self.data_root + '/labels/train_{}_{}/{}.png'.format(self.apply_partial,  self.partial_seed, self.idx_list[index]))
                 label_root = Image.fromarray(cityscapes_class_map(np.array(label_root)))
             else:
-                image_root = Image.open(self.root + '/images/val/{}.png'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/labels/val/{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/images/val/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/labels/val/{}.png'.format(self.idx_list[index]))
                 label_root = Image.fromarray(cityscapes_class_map(np.array(label_root)))
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0)
 
         if self.dataset == 'sun':
             if self.train:
-                image_root = Image.open(self.root + '/SUNRGBD-train_images/img-{:06d}.jpg'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/SUNRGBD-train_images/img-{:06d}.jpg'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(self.idx_list[index]))
                 label_root = Image.fromarray(sun_class_map(np.array(label_root)))
             else:
-                image_root = Image.open(self.root + '/SUNRGBD-test_images/img-{:06d}.jpg'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/SUNRGBD-test_images/img-{:06d}.jpg'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(self.idx_list[index]))
                 label_root = Image.fromarray(sun_class_map(np.array(label_root)))
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0)
 
         if self.dataset == 'glas':
-            image_root = Image.open(self.root + '/{}.bmp'.format(self.idx_list[index]))
+            image_root = Image.open(self.data_root + '/{}.bmp'.format(self.idx_list[index]))
             if self.apply_partial is None:
-                label_root = Image.open(self.root + '/{}_anno.bmp'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/{}_anno.bmp'.format(self.idx_list[index]))
             else:
-                label_root = Image.open(self.root + '/{}_{}/{}_anno.bmp'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
+                label_root = Image.open(self.data_root + '/{}_{}/{}_anno.bmp'.format(self.apply_partial,  self.partial_seed, self.idx_list[index],))
 
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0).clamp(0, 1)
 
         if self.dataset == 'crag':
-            image_root = Image.open(self.root + '/Images/{}.png'.format(self.idx_list[index]))
-            label_root = Image.open(self.root + '/Annotation/{}.png'.format(self.idx_list[index]))
+            if self.train:
+                image_root = Image.open(self.data_root + 'train/Images/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + 'train/Annotation/{}.png'.format(self.idx_list[index]))
+            else:
+                image_root = Image.open(self.data_root + 'valid/Images/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + 'valid/Annotation/{}.png'.format(self.idx_list[index]))
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0).clamp(0, 1)
 
         if self.dataset == 'monuseg':
             if self.train:
-                image_root = Image.open(self.root + '/Tissue Images/{}.tif'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/Annotations/{}_b.png'.format(self.idx_list[index]))                
+                image_root = Image.open(self.data_root + '/MoNuSeg 2018 Training Data/MoNuSeg 2018 Training Data/Tissue Images/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/MoNuSeg 2018 Training Data/MoNuSeg 2018 Training Data/Annotations/{}_b.png'.format(self.idx_list[index]))                
             else:
-                image_root = Image.open(self.root + '{}.tif'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '{}_b.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/MoNuSegTestData/MoNuSegTestData/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/MoNuSegTestData/MoNuSegTestData/{}_b.png'.format(self.idx_list[index]))
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0).clamp(0, 1)
 
         if self.dataset == 'livecell':
             if self.train:
-                image_root = Image.open(self.root + '/images/livecell_train_val_images/{}.tif'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/masks/train-val/{}_b.png'.format(self.idx_list[index]))                
+                image_root = Image.open(self.data_root + '/images/livecell_train_val_images/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/masks/train-val/{}_b.png'.format(self.idx_list[index]))                
             else:
-                image_root = Image.open(self.root + '/images/livecell_test_images/{}.tif'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/masks/test/{}_b.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/images/livecell_test_images/{}.tif'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/masks/test/{}_b.png'.format(self.idx_list[index]))
                 
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0).clamp(0, 1)
 
         if self.dataset == 'segpc':
             if self.train:
-                image_root = Image.open(self.root + '/train/train/train/x/{}.bmp'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/train/train/train/y_merge/{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/train/train/train/x/{}.bmp'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/train/train/train/y_merge/{}.png'.format(self.idx_list[index]))
             else:
-                image_root = Image.open(self.root + '/validation/validation/x/{}.bmp'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/validation/validation/y_merge/{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/validation/validation/x/{}.bmp'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/validation/validation/y_merge/{}.png'.format(self.idx_list[index]))
                 label_root = Image.fromarray(sun_class_map(np.array(label_root)))
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0)
 
         if self.dataset == 'mtchi':
             if self.train:
-                image_root = Image.open(self.root + '/Task2/Training/Img_crop/{}.png'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/Task2/Training/Truth_crop/Mask_{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/Task2/Training/Img_crop/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/Task2/Training/Truth_crop/Mask_{}.png'.format(self.idx_list[index]))
             else:
-                image_root = Image.open(self.root + '/Task2/Test/Img/{}.png'.format(self.idx_list[index]))
-                label_root = Image.open(self.root + '/Task2/Test/Truth/Mask_{}.png'.format(self.idx_list[index]))                
+                image_root = Image.open(self.data_root + '/Task2/Test/Img/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/Task2/Test/Truth/Mask_{}.png'.format(self.idx_list[index]))                
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0)
 
