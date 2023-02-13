@@ -564,6 +564,7 @@ class BuildDataLoader:
     def __init__(self, data_root, dataset, num_labels, datapath=None, ratio=0):
         self.data_root = data_root
         self.dataset = dataset
+        self.test_batch = 4
         
         if dataset == 'pascal':
             self.root = 'dataset/pascal'
@@ -575,7 +576,7 @@ class BuildDataLoader:
             self.train_l_idx, self.train_u_idx = get_pascal_idx(self.root, self.data_root, train=True, label_num=num_labels)
             self.test_idx = get_pascal_idx(self.root, self.data_root, train=False)
 
-        if dataset == 'cityscapes':
+        elif dataset == 'cityscapes':
             self.root = 'dataset/cityscapes'
             self.im_size = [512, 1024]
             self.crop_size = [512, 512]
@@ -585,7 +586,7 @@ class BuildDataLoader:
             self.train_l_idx, self.train_u_idx = get_cityscapes_idx(self.root, self.data_root, train=True, label_num=num_labels)
             self.test_idx = get_cityscapes_idx(self.root, self.data_root, train=False)
 
-        if dataset == 'sun':
+        elif dataset == 'sun':
             self.root = 'dataset/sun'
             self.im_size = [385, 513]
             self.crop_size = [321, 321]
@@ -595,7 +596,7 @@ class BuildDataLoader:
             self.train_l_idx, self.train_u_idx = get_sun_idx(self.root, self.data_root, train=True, label_num=num_labels)
             self.test_idx = get_sun_idx(self.root, self.data_root, train=False)
         
-        if dataset == 'glas':
+        elif dataset == 'glas':
             self.root = 'dataset/glas'
             self.im_size = [775, 522]
             self.crop_size = [321, 321]
@@ -604,6 +605,53 @@ class BuildDataLoader:
             self.batch_size = 10
             self.train_l_idx, self.train_u_idx = get_glas_idx(self.root, self.data_root, train=True, label_num=num_labels, ratio=ratio)
             self.test_idx = get_glas_idx(self.root, self.data_root, train=False)
+
+        elif dataset == 'crag':
+            self.root = 'dataset/crag'
+            self.test_batch = 1
+            self.im_size = -1 # do not crop test image with unconsistent size
+            self.crop_size = [321, 321]
+            self.num_segments = 2
+            self.scale_size = (0.5, 1.5)
+            self.batch_size = 10
+            self.train_l_idx, self.train_u_idx = get_crag_idx(self.root, self.data_root, train=True, label_num=num_labels, ratio=ratio)
+            self.test_idx = get_crag_idx(self.root, self.data_root, train=False)
+            
+        elif dataset == 'monuseg':
+            self.root = 'dataset/monuseg'
+            self.test_batch = 1
+            self.im_size = -1 # do not crop test image with unconsistent size
+            self.crop_size = [321, 321]
+            self.num_segments = 2
+            self.scale_size = (0.5, 1.5)
+            self.batch_size = 10
+            self.train_l_idx, self.train_u_idx = get_monuseg_idx(self.root, self.data_root, train=True, label_num=num_labels, ratio=ratio)
+            self.test_idx = get_monuseg_idx(self.root, self.data_root, train=False)
+            
+        elif dataset == 'livecell':
+            self.root = 'dataset/livecell'
+            self.test_batch = 1
+            self.im_size = -1 # do not crop test image with unconsistent size
+            self.crop_size = [321, 321]
+            self.num_segments = 2
+            self.scale_size = (0.5, 1.5)
+            self.batch_size = 10
+            self.train_l_idx, self.train_u_idx = get_livecell_idx(self.root, self.data_root, train=True, label_num=num_labels, ratio=ratio)
+            self.test_idx = get_livecell_idx(self.root, self.data_root, train=False)
+            
+        elif dataset == 'mtchi':
+            self.root = 'dataset/mtchi'
+            self.test_batch = 1
+            self.im_size = -1 # do not crop test image with unconsistent size
+            self.crop_size = [321, 321]
+            self.num_segments = 2
+            self.scale_size = (0.5, 1.5)
+            self.batch_size = 10
+            self.train_l_idx, self.train_u_idx = get_mtchi_idx(self.root, self.data_root, train=True, label_num=num_labels, ratio=ratio)
+            self.test_idx = get_mtchi_idx(self.root, self.data_root, train=False)
+
+        else:
+            raise NotImplementedError("Unknown dataset")
 
         if num_labels == 0:  # using all data
             self.train_l_idx = self.train_u_idx
