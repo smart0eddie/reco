@@ -369,8 +369,8 @@ def get_crag_idx(root, data_root, train=True, label_num=5, ratio=0):
             file_name = root + '/train.txt'
             return read_idx(file_name)
         else:
-            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
-            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            labeled_name = root + f'/subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'/subset_train/train_unlabeled_1-{ratio}.txt'
             return read_idx(labeled_name),  read_idx(unlabeled_name)
     else:
         file_name = root + '/val.txt'
@@ -384,8 +384,8 @@ def get_monuseg_idx(root, data_root, train=True, label_num=5, ratio=0):
             file_name = root + '/train.txt'
             return read_idx(file_name)
         else:
-            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
-            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            labeled_name = root + f'/subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'/subset_train/train_unlabeled_1-{ratio}.txt'
             return read_idx(labeled_name),  read_idx(unlabeled_name)
     else:
         file_name = root + '/val.txt'
@@ -399,8 +399,8 @@ def get_livecell_idx(root, data_root, train=True, label_num=5, ratio=0):
             file_name = root + '/train.txt'
             return read_idx(file_name)
         else:
-            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
-            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            labeled_name = root + f'/subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'/subset_train/train_unlabeled_1-{ratio}.txt'
             return read_idx(labeled_name),  read_idx(unlabeled_name)
     else:
         file_name = root + '/test.txt'
@@ -414,8 +414,8 @@ def get_segpc_idx(root, data_root, train=True, label_num=5, ratio=0):
             file_name = root + '/train.txt'
             return read_idx(file_name)
         else:
-            labeled_name = root + f'subset_train/train_labeled_1-{ratio}.txt'
-            unlabeled_name = root + f'subset_train/train_unlabeled_1-{ratio}.txt'
+            labeled_name = root + f'/subset_train/train_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'/subset_train/train_unlabeled_1-{ratio}.txt'
             return read_idx(labeled_name),  read_idx(unlabeled_name)
     else:
         file_name = root + '/val.txt'
@@ -429,8 +429,8 @@ def get_mtchi_idx(root, data_root, train=True, label_num=5, ratio=0):
             file_name = root + '/train_crop.txt'
             return read_idx(file_name)
         else:
-            labeled_name = root + f'subset_train/train_crop_labeled_1-{ratio}.txt'
-            unlabeled_name = root + f'subset_train/train_crop_unlabeled_1-{ratio}.txt'
+            labeled_name = root + f'/subset_train/train_crop_labeled_1-{ratio}.txt'
+            unlabeled_name = root + f'/subset_train/train_crop_unlabeled_1-{ratio}.txt'
             return read_idx(labeled_name),  read_idx(unlabeled_name)
     else:
         file_name = root + '/test.txt'
@@ -503,11 +503,11 @@ class BuildDataset(Dataset):
 
         if self.dataset == 'crag':
             if self.train:
-                image_root = Image.open(self.data_root + 'train/Images/{}.png'.format(self.idx_list[index]))
-                label_root = Image.open(self.data_root + 'train/Annotation/{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/train/Images/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/train/Annotation/{}.png'.format(self.idx_list[index]))
             else:
-                image_root = Image.open(self.data_root + 'valid/Images/{}.png'.format(self.idx_list[index]))
-                label_root = Image.open(self.data_root + 'valid/Annotation/{}.png'.format(self.idx_list[index]))
+                image_root = Image.open(self.data_root + '/valid/Images/{}.png'.format(self.idx_list[index]))
+                label_root = Image.open(self.data_root + '/valid/Annotation/{}.png'.format(self.idx_list[index]))
             image, label = transform(image_root, label_root, None, self.crop_size, self.scale_size, self.augmentation)
             return image, label.squeeze(0).clamp(0, 1)
 
