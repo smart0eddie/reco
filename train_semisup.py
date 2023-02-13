@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(description='Semi-supervised Segmentation with 
 parser.add_argument('--mode', default=None, type=str)
 parser.add_argument('--port', default=None, type=int)
 
+parser.add_argument('--data_root', default='/dataset', type=str, help='root folder of target dataset')
+
 parser.add_argument('--gpu', default=0, type=int)
 parser.add_argument('--num_labels', default=15, type=int, help='number of labelled training data, set 0 to use all training data')
 parser.add_argument('--label_ratio', default=0, type=int, help='ratio of labelled training data, only works for glas dataset')
@@ -37,7 +39,7 @@ torch.manual_seed(args.seed)
 np.random.seed(args.seed)
 random.seed(args.seed)
 
-data_loader = BuildDataLoader(args.dataset, args.num_labels, ratio=args.label_ratio)
+data_loader = BuildDataLoader(args.data_root, args.dataset, args.num_labels, ratio=args.label_ratio)
 train_l_loader, train_u_loader, test_loader = data_loader.build(supervised=False)
 
 # Load Semantic Network
