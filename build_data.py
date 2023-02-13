@@ -137,8 +137,9 @@ def sun_class_map(mask):
 # --------------------------------------------------------------------------------
 # Define indices for labelled, unlabelled training images, and test images
 # --------------------------------------------------------------------------------
-def get_pascal_idx(root, train=True, label_num=5):
+def get_pascal_idx(root, data_root, train=True, label_num=5):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         file_name = root + '/train_aug.txt'
     else:
@@ -160,7 +161,7 @@ def get_pascal_idx(root, train=True, label_num=5):
                 idx_list_ = save_idx.copy()
                 idx = idx_list_.pop()
                 save_idx = []
-            mask = np.array(Image.open(root + '/SegmentationClassAug/{}.png'.format(idx)))
+            mask = np.array(Image.open(data_root + '/SegmentationClassAug/{}.png'.format(idx)))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)   # number of unique classes
 
@@ -182,12 +183,13 @@ def get_pascal_idx(root, train=True, label_num=5):
         return idx_list
 
 
-def get_cityscapes_idx(root, train=True, label_num=5):
+def get_cityscapes_idx(root, data_root, train=True, label_num=5):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
-        file_list = glob.glob(root + '/images/train/*.png')
+        file_list = glob.glob(data_root + '/images/train/*.png')
     else:
-        file_list = glob.glob(root + '/images/val/*.png')
+        file_list = glob.glob(data_root + '/images/val/*.png')
     idx_list = [int(file[file.rfind('/') + 1: file.rfind('.')]) for file in file_list]
 
     if train:
@@ -205,7 +207,7 @@ def get_cityscapes_idx(root, train=True, label_num=5):
                 idx = idx_list_.pop()
                 save_idx = []
 
-            mask = cityscapes_class_map(np.array(Image.open(root + '/labels/train/{}.png'.format(idx))))
+            mask = cityscapes_class_map(np.array(Image.open(data_root + '/labels/train/{}.png'.format(idx))))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)  # number of unique classes
 
@@ -228,11 +230,12 @@ def get_cityscapes_idx(root, train=True, label_num=5):
 
 def get_sun_idx(root, train=True, label_num=5):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
-        file_list = glob.glob(root + '/SUNRGBD-train_images/*.jpg')
+        file_list = glob.glob(data_root + '/SUNRGBD-train_images/*.jpg')
         idx_list = [int(file[file.rfind('-') + 1: file.rfind('.')]) for file in file_list]
     else:
-        file_list = glob.glob(root + '/SUNRGBD-test_images/*.jpg')
+        file_list = glob.glob(data_root + '/SUNRGBD-test_images/*.jpg')
         idx_list = [int(file[file.rfind('-') + 1: file.rfind('.')]) for file in file_list]
 
     if train:
@@ -244,7 +247,7 @@ def get_sun_idx(root, train=True, label_num=5):
         class_list = [[] for _ in range(37)]
         for i in range(len(idx_list_)):
             idx = idx_list_[i]
-            mask = sun_class_map(np.array(Image.open(root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(idx))))
+            mask = sun_class_map(np.array(Image.open(data_root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(idx))))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             for k in mask_unique:
                 class_list[k].append(idx)
@@ -263,7 +266,7 @@ def get_sun_idx(root, train=True, label_num=5):
             # sample image by the current lowest appeared class
             if idx not in labeled_idx:
                 labeled_idx.append(idx)
-                mask = sun_class_map(np.array(Image.open(root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(idx))))
+                mask = sun_class_map(np.array(Image.open(data_root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(idx))))
                 mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
                 label_counter[mask_unique] += 1
 
@@ -281,11 +284,12 @@ def get_sun_idx(root, train=True, label_num=5):
 
 def get_glas_idx(root, train=True, label_num=5, ratio=0):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         if ratio == 0:
             file_name = root + '/train.txt'
         else:
-            return get_glas_idx_train_split(root, ratio)       
+            return get_glas_idx_train_split(root, data_root, ratio)       
     else:
         file_name = root + '/val.txt'
     with open(file_name) as f:
@@ -305,7 +309,7 @@ def get_glas_idx(root, train=True, label_num=5, ratio=0):
                 idx_list_ = save_idx.copy()
                 idx = idx_list_.pop()
                 save_idx = []
-            mask = np.array(Image.open(root + '/{}.bmp'.format(idx)))
+            mask = np.array(Image.open(data_root + '/{}.bmp'.format(idx)))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)   # number of unique classes
 
@@ -326,12 +330,13 @@ def get_glas_idx(root, train=True, label_num=5, ratio=0):
     else:
         return idx_list
 
-def get_glas_idx_train_split(root, ratio=1):
+def get_glas_idx_train_split(root, data_root, ratio=1):
     """
     Read index from split file
     """
 
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     
     if ratio == 1:
         file_name = root + '/train.txt'
@@ -356,8 +361,9 @@ def read_idx(filepath):
         idx_list = f.read().splitlines()                
     return idx_list
     
-def get_crag_idx(root, train=True, label_num=5, ratio=0):
+def get_crag_idx(root, data_root, train=True, label_num=5, ratio=0):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         if ratio in [0, 1]:
             file_name = root + '/train.txt'
@@ -370,8 +376,9 @@ def get_crag_idx(root, train=True, label_num=5, ratio=0):
         file_name = root + '/val.txt'
         return read_idx(file_name)
 
-def get_monuseg_idx(root, train=True, label_num=5, ratio=0):
+def get_monuseg_idx(root, data_root, train=True, label_num=5, ratio=0):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         if ratio in [0, 1]:
             file_name = root + '/train.txt'
@@ -384,8 +391,9 @@ def get_monuseg_idx(root, train=True, label_num=5, ratio=0):
         file_name = root + '/val.txt'
         return read_idx(file_name)
 
-def get_livecell_idx(root, train=True, label_num=5, ratio=0):
+def get_livecell_idx(root, data_root, train=True, label_num=5, ratio=0):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         if ratio in [0, 1]:
             file_name = root + '/train.txt'
@@ -398,8 +406,9 @@ def get_livecell_idx(root, train=True, label_num=5, ratio=0):
         file_name = root + '/test.txt'
         return read_idx(file_name)
 
-def get_segpc_idx(root, train=True, label_num=5, ratio=0):
+def get_segpc_idx(root, data_root, train=True, label_num=5, ratio=0):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         if ratio in [0, 1]:
             file_name = root + '/train.txt'
@@ -412,8 +421,9 @@ def get_segpc_idx(root, train=True, label_num=5, ratio=0):
         file_name = root + '/val.txt'
         return read_idx(file_name)
 
-def get_mtchi_idx(root, train=True, label_num=5, ratio=0):
+def get_mtchi_idx(root, data_root, train=True, label_num=5, ratio=0):
     root = os.path.expanduser(root)
+    data_root = os.path.expanduser(data_root)
     if train:
         if ratio in [0, 1]:
             file_name = root + '/train_crop.txt'
@@ -551,59 +561,61 @@ class BuildDataset(Dataset):
 # Create data loader in PyTorch format
 # --------------------------------------------------------------------------------
 class BuildDataLoader:
-    def __init__(self, dataset, num_labels, datapath=None, ratio=0):
+    def __init__(self, data_root, dataset, num_labels, datapath=None, ratio=0):
+        self.data_root = data_root
         self.dataset = dataset
+        
         if dataset == 'pascal':
-            self.data_path = 'dataset/pascal'
+            self.root = 'dataset/pascal'
             self.im_size = [513, 513]
             self.crop_size = [321, 321]
             self.num_segments = 21
             self.scale_size = (0.5, 1.5)
             self.batch_size = 10
-            self.train_l_idx, self.train_u_idx = get_pascal_idx(self.data_path, train=True, label_num=num_labels)
-            self.test_idx = get_pascal_idx(self.data_path, train=False)
+            self.train_l_idx, self.train_u_idx = get_pascal_idx(self.root, self.data_root, train=True, label_num=num_labels)
+            self.test_idx = get_pascal_idx(self.root, self.data_root, train=False)
 
         if dataset == 'cityscapes':
-            self.data_path = 'dataset/cityscapes'
+            self.root = 'dataset/cityscapes'
             self.im_size = [512, 1024]
             self.crop_size = [512, 512]
             self.num_segments = 19
             self.scale_size = (1.0, 1.0)
             self.batch_size = 2
-            self.train_l_idx, self.train_u_idx = get_cityscapes_idx(self.data_path, train=True, label_num=num_labels)
-            self.test_idx = get_cityscapes_idx(self.data_path, train=False)
+            self.train_l_idx, self.train_u_idx = get_cityscapes_idx(self.root, self.data_root, train=True, label_num=num_labels)
+            self.test_idx = get_cityscapes_idx(self.root, self.data_root, train=False)
 
         if dataset == 'sun':
-            self.data_path = 'dataset/sun'
+            self.root = 'dataset/sun'
             self.im_size = [385, 513]
             self.crop_size = [321, 321]
             self.num_segments = 37
             self.scale_size = (0.5, 1.5)
             self.batch_size = 5
-            self.train_l_idx, self.train_u_idx = get_sun_idx(self.data_path, train=True, label_num=num_labels)
-            self.test_idx = get_sun_idx(self.data_path, train=False)
+            self.train_l_idx, self.train_u_idx = get_sun_idx(self.root, self.data_root, train=True, label_num=num_labels)
+            self.test_idx = get_sun_idx(self.root, self.data_root, train=False)
         
         if dataset == 'glas':
-            self.data_path = 'dataset/glas'
+            self.root = 'dataset/glas'
             self.im_size = [775, 522]
             self.crop_size = [321, 321]
             self.num_segments = 2
             self.scale_size = (0.5, 1.5)
             self.batch_size = 10
-            self.train_l_idx, self.train_u_idx = get_glas_idx(self.data_path, train=True, label_num=num_labels, ratio=ratio)
-            self.test_idx = get_glas_idx(self.data_path, train=False)
+            self.train_l_idx, self.train_u_idx = get_glas_idx(self.root, self.data_root, train=True, label_num=num_labels, ratio=ratio)
+            self.test_idx = get_glas_idx(self.root, self.data_root, train=False)
 
         if num_labels == 0:  # using all data
             self.train_l_idx = self.train_u_idx
 
     def build(self, supervised=False, partial=None, partial_seed=None):
-        train_l_dataset = BuildDataset(self.data_path, self.dataset, self.train_l_idx,
+        train_l_dataset = BuildDataset(self.root, self.data_root, self.dataset, self.train_l_idx,
                                        crop_size=self.crop_size, scale_size=self.scale_size,
                                        augmentation=True, train=True, apply_partial=partial, partial_seed=partial_seed)
-        train_u_dataset = BuildDataset(self.data_path, self.dataset, self.train_u_idx,
+        train_u_dataset = BuildDataset(self.root, self.data_root, self.dataset, self.train_u_idx,
                                        crop_size=self.crop_size, scale_size=(1.0, 1.0),
                                        augmentation=False, train=True, apply_partial=partial, partial_seed=partial_seed)
-        test_dataset    = BuildDataset(self.data_path, self.dataset, self.test_idx,
+        test_dataset    = BuildDataset(self.root, self.data_root, self.dataset, self.test_idx,
                                        crop_size=self.im_size, scale_size=(1.0, 1.0),
                                        augmentation=False, train=False)
 
