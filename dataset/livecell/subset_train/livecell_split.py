@@ -66,6 +66,6 @@ val = get_file_name(coco_val, coco_val.getImgIds())
 write_data(root + "val.txt", val)
 
 # test
-coco_test = COCO(val_set_path)
+coco_test = COCO(test_set_path)
 test = get_file_name(coco_test, coco_test.getImgIds())
 write_data(root + "test.txt", test)
